@@ -8,6 +8,8 @@ import {
     Param,
     Delete,
     UseGuards,
+    Request,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -16,6 +18,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { User } from './entities/user.entity';
 import { UserRole } from './entities/enums/user-role.enum';
 import { IUser } from './entities/model/user';
+import { CreateUserDto } from './dtos/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -23,10 +26,10 @@ export class UsersController {
 
     // Public endpoint to create a new user
     @Post()
-    async create(@Body() user: IUser) {
+    async create(@Body() createUserDto: CreateUserDto) {
         const dateVal = new Date().getTime()
         const userData: User = {
-            ...user,
+            ...createUserDto,
             id: null,
             role: UserRole.CUSTOMER, // Default role, adjust as needed
             createdAt: dateVal,
@@ -43,6 +46,12 @@ export class UsersController {
         return this.usersService.findAll();
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get('profile')
+    async getProfile(@Request() req) {
+        return this.usersService.findOne(req.user.userId);
+    }
+
     // Protected endpoint to get a user by ID
     @UseGuards(JwtAuthGuard)
     @Get(':id')
@@ -53,8 +62,16 @@ export class UsersController {
     // Protected endpoint to update a user
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
-    async update(@Param('id') id: number, @Body() user: Partial<User>) {
-        return this.usersService.update(id, user);
+    async update(
+        @Param('id') id: number,
+        @Body() updateUserDto: Partial<User>,
+        @Request() req,
+    ) {
+        const userId = parseInt(id.toString(), 10);
+        if (req.user.userId !== userId && req.user.role !== UserRole.ADMIN) {
+            throw new UnauthorizedException();
+        }
+        return this.usersService.update(userId, updateUserDto);
     }
 
     // Protected endpoint to delete a user (admin only)

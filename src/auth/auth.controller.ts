@@ -1,6 +1,7 @@
 // auth/auth.controller.ts
-import { Controller, Request, Post } from '@nestjs/common';
+import { Controller, Request, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dtos/login.dto';
 
 @Controller()
 export class AuthController {
@@ -8,14 +9,7 @@ export class AuthController {
 
     // User login endpoint
     @Post('auth/login')
-    async login(@Request() req) {
-        const user = await this.authService.validateUser(
-            req.body.username,
-            req.body.password,
-        );
-        if (!user) {
-            return { message: 'Invalid credentials' };
-        }
-        return this.authService.login(user);
+    async login(@Body() loginDto: LoginDto) {
+        return this.authService.login(loginDto);
     }
 }
