@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { UserRole } from './enums/user-role.enum';
 
 
-
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -21,9 +20,15 @@ export class User {
     })
     role: UserRole;
 
-    @Column()
+    @Column({
+        type: 'bigint',
+
+    })
     createdAt: number;
 
-    @Column()
+    @Column({
+        type: 'bigint',
+
+    })
     lastUpdatedAt: number;
 }

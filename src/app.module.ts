@@ -5,6 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { LinkInBioModule } from './link-in-bio/link-in-bio.module';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
 
@@ -22,7 +23,8 @@ import { UsersModule } from './users/users.module';
       synchronize: true, // Disable in production
     }),
     UsersModule,
-    LinkInBioModule],
+    LinkInBioModule,
+    AuthModule],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
