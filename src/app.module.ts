@@ -2,10 +2,9 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerModule } from 'nestjs-pino';
 
-import { UserModule } from './user/user.module';
 import { LinkInBioModule } from './link-in-bio/link-in-bio.module';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
-
+import { UsersModule } from './users/users.module';
 
 @Module({
 
@@ -22,7 +21,7 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
       autoLoadEntities: true,
       synchronize: true, // Disable in production
     }),
-    UserModule,
+    UsersModule,
     LinkInBioModule],
 })
 export class AppModule {
