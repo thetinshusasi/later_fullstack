@@ -1,4 +1,3 @@
-// src/links/links.controller.ts
 import {
     Controller,
     Post,
@@ -43,7 +42,7 @@ export class LinksController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(CacheInterceptor)
     @CacheKey('links')
-    @CacheTTL(30) // Cache for 30 seconds
+    @CacheTTL(30)
     @Get('links')
     async getLinks(@Query('page') page = 1, @Query('limit') limit = 10): Promise<Link[]> {
         const skip = (page - 1) * limit;

@@ -1,0 +1,1 @@
+export type DatabaseType = "mysql" | "mariadb" | "postgres" | "cockroachdb" | "sqlite" | "mssql" | "sap" | "oracle";

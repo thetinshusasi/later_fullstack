@@ -20,7 +20,7 @@ export class Link {
     @IsString()
     newUrl: string;
 
-    @ManyToOne(() => User, user => user.links, { onDelete: 'CASCADE' }) // Specifies the behavior on deletion of the User
+    @ManyToOne(() => User, user => user.links, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user: User;
 }

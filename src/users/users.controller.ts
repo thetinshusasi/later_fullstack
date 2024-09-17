@@ -1,5 +1,4 @@
 import { IRequestContext } from './../auth/models/request-context';
-// users/users.controller.ts
 import {
     Controller,
     Get,

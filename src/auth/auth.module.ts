@@ -1,8 +1,7 @@
-// auth/auth.module.ts
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 
 import { JwtAuthGuard } from './jwt-auth.guard';

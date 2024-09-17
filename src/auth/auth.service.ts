@@ -1,8 +1,7 @@
-// auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt'; // For password hashing
+import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
 import { TokensService } from 'src/token/token.service';
 import ITokenPayload from './models/token-payload';
@@ -20,13 +19,12 @@ export class
     async validateUser(username: string, pass: string): Promise<any> {
         const user = await this.usersService.findByUsername(username);
         if (user && (await bcrypt.compare(pass, user.password))) {
-            const { password, ...result } = user; // Exclude password
+            const { password, ...result } = user;
             return result;
         }
         return null;
     }
 
-    // Generate JWT token
     async login(loginDto: LoginDto) {
         try {
             const { username, password } = loginDto;

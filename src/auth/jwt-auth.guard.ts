@@ -1,4 +1,3 @@
-// src/auth/jwt-auth.guard.ts
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
@@ -25,7 +24,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         const decodeToken = this.jwtService.decode(token);
         const { userId, exp } = decodeToken
 
-        // Validate token in database
         const latestToken = await this.tokensService.findByUserIdAndToken(userId, token);
         const currentTime = getCurrentTimeInSeconds();
         if (latestToken && currentTime <= exp) {

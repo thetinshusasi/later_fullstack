@@ -1,15 +1,13 @@
-
-import { forwardRef, Module } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersController } from './users.controller';
-import { User } from './entities/user.entity';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { AuthModule } from 'src/auth/auth.module';
-import { TokenModule } from 'src/token/token.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ContextExtractInterceptor } from 'src/interceptors/context-extract/context-extract.interceptor';
+import { TokenModule } from 'src/token/token.module';
+import { User } from './entities/user.entity';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+
+
 @Module({
   imports: [TypeOrmModule.forFeature([User]),
     TokenModule,

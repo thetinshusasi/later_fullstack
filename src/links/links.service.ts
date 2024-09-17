@@ -1,4 +1,3 @@
-// src/links/links.service.ts
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -29,12 +28,10 @@ export class LinksService {
 
         let newUrl = new URL(url);
         if (linkData) {
-            // Merge old parameters with new ones. If a key exists in both, the new value is used.
             const oldParams = linkData.parameters;
             params = { ...oldParams, ...params };
         }
 
-        // Use URLSearchParams to handle the parameters correctly
         const searchParams = new URLSearchParams();
         for (const [key, value] of Object.entries(params)) {
             searchParams.set(key, value);
