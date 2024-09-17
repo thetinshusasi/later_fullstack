@@ -80,7 +80,7 @@ export class LinksController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(CacheInterceptor)
     @CacheKey('links')
-    @CacheTTL(30)
+    @CacheTTL(Number(process.env.CACHE_TTL) || 3600)
     @Get('links')
     @ApiOperation({ summary: 'Get all links' })
     @ApiResponse({
