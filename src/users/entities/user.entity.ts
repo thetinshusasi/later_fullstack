@@ -1,24 +1,30 @@
+// src/users/entities/user.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
-import { UserRole } from './enums/user-role.enum';
+import { UserRole } from '../models/enums/user-role.enum';
 import { Token } from 'src/token/entities/token.entity';
 import { Link } from 'src/links/entities/link.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class User {
+    @ApiProperty({ example: 1, description: 'Unique identifier of the user' })
     @PrimaryGeneratedColumn()
     id: number;
 
+    @ApiProperty({ example: 'john_doe', description: 'Username chosen by the user' })
     @Column({ unique: true })
     @IsNotEmpty()
     @IsString()
     username: string;
 
+    @ApiProperty({ example: 'hashedpassword', description: 'User password (hashed)', writeOnly: true })
     @Column()
     @IsNotEmpty()
     @IsString()
     password: string;
 
+    @ApiProperty({ example: UserRole.CUSTOMER, enum: UserRole, description: 'Role assigned to the user' })
     @Column({
         type: 'enum',
         enum: UserRole,
@@ -27,15 +33,19 @@ export class User {
     @IsEnum(UserRole)
     role: UserRole;
 
+    @ApiProperty({ example: 1609459200000, description: 'Timestamp when the user was created' })
     @Column({ type: 'bigint' })
     createdAt: number;
 
+    @ApiProperty({ example: 1609545600000, description: 'Timestamp when the user was last updated' })
     @Column({ type: 'bigint' })
     lastUpdatedAt: number;
 
-    @OneToMany(() => Link, link => link.user)
+    @ApiProperty({ description: 'Links associated with the user', type: () => [Link] })
+    @OneToMany(() => Link, (link) => link.user)
     links: Link[];
 
-    @OneToMany(() => Token, token => token.user)
+    @ApiProperty({ description: 'Tokens associated with the user', type: () => [Token] })
+    @OneToMany(() => Token, (token) => token.user)
     tokens: Token[];
 }

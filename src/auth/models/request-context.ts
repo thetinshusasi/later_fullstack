@@ -1,4 +1,4 @@
-import { UserRole } from "src/users/entities/enums/user-role.enum";
+import { UserRole } from "src/users/models/enums/user-role.enum";
 
 export interface IRequestContext {
     userId: number;

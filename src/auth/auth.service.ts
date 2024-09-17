@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
 import { TokensService } from 'src/token/token.service';
 import ITokenPayload from './models/token-payload';
-import { UserRole } from 'src/users/entities/enums/user-role.enum';
+import { UserRole } from 'src/users/models/enums/user-role.enum';
 
 @Injectable()
 export class

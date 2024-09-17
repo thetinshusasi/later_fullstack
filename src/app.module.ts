@@ -26,11 +26,11 @@ import { DatabaseType } from './common/models/types/databases';
     }),
     TypeOrmModule.forRoot({
       type: String(process.env.DATABASE_TYPE) as DatabaseType,
-      host: process.env.DB_HOST || 'localhost',
-      port: +process.env.DB_PORT || 5433,
-      username: process.env.DB_USERNAME || 'nest_user',
-      password: process.env.DB_PASSWORD || 'nest_password',
-      database: process.env.DB_NAME || 'nest_db',
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DATABASE_PORT) || 5433,
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME,
       autoLoadEntities: true,
       synchronize: Boolean(process.env.SYNCHRONIZE) || false
     }),
