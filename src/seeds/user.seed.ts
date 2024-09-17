@@ -7,32 +7,25 @@ export const seedUsers = async (dataSource: DataSource) => {
     const userRepository = dataSource.getRepository(User);
 
     const date = new Date().getTime();
-    const admin: User = {
-        id: 1,
-        username: 'admin',
-        password: await bcrypt.hash('adminpass', 10),
-        role: UserRole.ADMIN,
-        createdAt: date,
-        lastUpdatedAt: date,
-    };
 
-    const user1: User = {
-        id: 2,
-        username: 'user1',
-        password: await bcrypt.hash('user1pass', 10),
-        role: UserRole.CUSTOMER,
-        createdAt: date,
-        lastUpdatedAt: date,
-    };
+    const usersData = [
+        { id: 1, username: 'admin1', password: 'adminpass', role: UserRole.ADMIN },
+        { id: 2, username: 'user1', password: 'user1pass', role: UserRole.CUSTOMER },
+        { id: 3, username: 'user2', password: 'user2pass', role: UserRole.CUSTOMER }
+    ];
+    for (let userData of usersData) {
+        let user = await userRepository.findOne({ where: { username: userData.username } });
 
-    const user2: User = {
-        id: 3,
-        username: 'user2',
-        password: await bcrypt.hash('user2pass', 10),
-        role: UserRole.CUSTOMER,
-        createdAt: date,
-        lastUpdatedAt: date,
-    };
+        if (!user) {
+            user = new User();
+        }
 
-    await userRepository.save([admin, user1, user2]);
+        user.username = userData.username;
+        user.password = await bcrypt.hash(userData.password, 10);
+        user.role = userData.role;
+        user.createdAt = user.createdAt || date;
+        user.lastUpdatedAt = date;
+
+        await userRepository.save(user);
+    }
 };
