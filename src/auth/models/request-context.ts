@@ -1,6 +1,6 @@
-import { UserRole } from "src/users/models/enums/user-role.enum";
+import { UserRole } from "../../users/models/enums/user-role.enum";
 
-export interface IRequestContext {
+interface IRequestContext {
     userId: number;
     username: string;
     role: UserRole;
@@ -8,3 +8,5 @@ export interface IRequestContext {
     exp: number;
 }
 
+
+export { IRequestContext };

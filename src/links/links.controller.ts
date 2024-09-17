@@ -15,8 +15,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateLinkDto } from './dtos/create-link.dto';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Link } from './entities/link.entity';
-import { ContextExtractInterceptor } from 'src/interceptors/context-extract/context-extract.interceptor';
-import { IRequestContext } from 'src/auth/models/request-context';
+import { ContextExtractInterceptor } from '../interceptors/context-extract/context-extract.interceptor';
+import { IRequestContext } from '../auth/models/request-context';
 import {
     ApiTags,
     ApiBearerAuth,

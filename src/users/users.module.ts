@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ContextExtractInterceptor } from 'src/interceptors/context-extract/context-extract.interceptor';
-import { TokenModule } from 'src/token/token.module';
+import { ContextExtractInterceptor } from '../interceptors/context-extract/context-extract.interceptor';
+import { TokenModule } from '../token/token.module';
 import { User } from './entities/user.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';

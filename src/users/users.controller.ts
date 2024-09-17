@@ -20,9 +20,9 @@ import { RolesGuard } from '../auth/roles.guard';
 import { User } from './entities/user.entity';
 import { UserRole } from './models/enums/user-role.enum';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { ContextExtractInterceptor } from 'src/interceptors/context-extract/context-extract.interceptor';
+import { ContextExtractInterceptor } from '../interceptors/context-extract/context-extract.interceptor';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
-import { IRequestContext } from 'src/auth/models/request-context';
+import { IRequestContext } from '../auth/models/request-context';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('users')
@@ -35,6 +35,8 @@ export class UsersController {
         private readonly logger: Logger, // Inject Logger
     ) { }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Post()
     @ApiOperation({ summary: 'Create a new user' })
     @ApiResponse({ status: 201, description: 'User created successfully', type: User })

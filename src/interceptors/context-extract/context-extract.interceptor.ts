@@ -2,7 +2,6 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Unauthorize
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { IRequestContext } from 'src/auth/models/request-context';
-
 @Injectable()
 export class ContextExtractInterceptor implements NestInterceptor {
   constructor(private readonly jwtService: JwtService) {

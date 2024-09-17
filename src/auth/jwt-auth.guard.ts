@@ -1,8 +1,8 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { TokensService } from 'src/token/token.service';
-import { getCurrentTimeInSeconds } from 'src/utils/dateHelper';
+import { TokensService } from '../token/token.service';
+import { getCurrentTimeInSeconds } from '../utils/dateHelper';
 
 
 @Injectable()

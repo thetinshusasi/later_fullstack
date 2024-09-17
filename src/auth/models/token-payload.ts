@@ -1,4 +1,4 @@
-import { UserRole } from "src/users/models/enums/user-role.enum";
+import { UserRole } from "../../users/models/enums/user-role.enum";
 
 export default interface ITokenPayload {
     tokenId: number;

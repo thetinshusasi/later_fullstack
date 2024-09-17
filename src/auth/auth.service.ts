@@ -3,9 +3,9 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
-import { TokensService } from 'src/token/token.service';
+import { TokensService } from '../token/token.service';
 import ITokenPayload from './models/token-payload';
-import { UserRole } from 'src/users/models/enums/user-role.enum';
+import { UserRole } from '../users/models/enums/user-role.enum';
 
 @Injectable()
 export class

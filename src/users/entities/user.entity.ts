@@ -1,10 +1,9 @@
-// src/users/entities/user.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
 import { UserRole } from '../models/enums/user-role.enum';
-import { Token } from 'src/token/entities/token.entity';
-import { Link } from 'src/links/entities/link.entity';
+import { Link } from '../../links/entities/link.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Token } from '../../token/entities/token.entity';
 
 @Entity()
 export class User {

@@ -8,8 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { URL } from 'url';
 import { Link } from './entities/link.entity';
 import { CreateLinkDto } from './dtos/create-link.dto';
-import { isValidUrl } from 'src/utils/urlHelper';
-import { User } from 'src/users/entities/user.entity';
+import { isValidUrl } from '../utils/urlHelper';
+import { User } from '../users/entities/user.entity';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
