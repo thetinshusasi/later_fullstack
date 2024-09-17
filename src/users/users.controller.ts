@@ -1,3 +1,4 @@
+import { IRequestContext } from './../auth/models/request-context';
 // users/users.controller.ts
 import {
     Controller,
@@ -10,6 +11,7 @@ import {
     UseGuards,
     Request,
     UnauthorizedException,
+    UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -19,48 +21,51 @@ import { User } from './entities/user.entity';
 import { UserRole } from './entities/enums/user-role.enum';
 import { IUser } from './entities/model/user';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { ContextExtractInterceptor } from 'src/interceptors/context-extract/context-extract.interceptor';
 
 @Controller('users')
+@UseInterceptors(ContextExtractInterceptor)
+
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
-    // Public endpoint to create a new user
     @Post()
     async create(@Body() createUserDto: CreateUserDto) {
         const dateVal = new Date().getTime()
-        const userData: User = {
-            ...createUserDto,
-            id: null,
-            role: UserRole.CUSTOMER, // Default role, adjust as needed
-            createdAt: dateVal,
-            lastUpdatedAt: dateVal,
-        }
-        return this.usersService.create(userData);
+
+        const user = new User();
+        user.username = createUserDto.username;
+        user.password = createUserDto.password;
+        user.role = UserRole.CUSTOMER;
+        user.createdAt = dateVal;
+        user.lastUpdatedAt = dateVal;
+
+        return this.usersService.create(user);
     }
 
-    // Protected endpoint to get all users (admin only)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.ADMIN)
     @Get()
-    async findAll() {
+    async findAll(@Request() req) {
         return this.usersService.findAll();
     }
 
     @UseGuards(JwtAuthGuard)
     @Get('profile')
     async getProfile(@Request() req) {
-        return this.usersService.findOne(req.user.userId);
+        const context: IRequestContext = req.context;
+        return this.usersService.findOne(context.userId);
     }
 
-    // Protected endpoint to get a user by ID
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Get(':id')
     async findOne(@Param('id') id: number) {
         return this.usersService.findOne(id);
     }
 
-    // Protected endpoint to update a user
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN)
     @Patch(':id')
     async update(
         @Param('id') id: number,
@@ -74,7 +79,6 @@ export class UsersController {
         return this.usersService.update(userId, updateUserDto);
     }
 
-    // Protected endpoint to delete a user (admin only)
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(UserRole.ADMIN)
     @Delete(':id')
