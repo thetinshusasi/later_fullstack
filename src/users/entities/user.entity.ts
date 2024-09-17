@@ -1,13 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { IsNotEmpty, IsString, IsEnum } from 'class-validator';
 import { UserRole } from './enums/user-role.enum';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-
+import { Token } from 'src/token/entities/token.entity';
+import { Link } from 'src/links/entities/link.entity';
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
-
 
     @Column({ unique: true })
     @IsNotEmpty()
@@ -27,15 +27,15 @@ export class User {
     @IsEnum(UserRole)
     role: UserRole;
 
-    @Column({
-        type: 'bigint',
-
-    })
+    @Column({ type: 'bigint' })
     createdAt: number;
 
-    @Column({
-        type: 'bigint',
-
-    })
+    @Column({ type: 'bigint' })
     lastUpdatedAt: number;
+
+    @OneToMany(() => Link, link => link.user)
+    links: Link[];
+
+    @OneToMany(() => Token, token => token.user)
+    tokens: Token[];
 }
