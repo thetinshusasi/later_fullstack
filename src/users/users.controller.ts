@@ -10,6 +10,8 @@ import {
     Request,
     UnauthorizedException,
     UseInterceptors,
+    NotFoundException,
+    InternalServerErrorException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -21,13 +23,17 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { ContextExtractInterceptor } from 'src/interceptors/context-extract/context-extract.interceptor';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { IRequestContext } from 'src/auth/models/request-context';
+import { Logger } from 'nestjs-pino';
 
 @ApiTags('users')
 @ApiBearerAuth('access-token')
 @Controller('users')
 @UseInterceptors(ContextExtractInterceptor)
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly logger: Logger, // Inject Logger
+    ) { }
 
     @Post()
     @ApiOperation({ summary: 'Create a new user' })
@@ -35,16 +41,24 @@ export class UsersController {
     @ApiResponse({ status: 400, description: 'Invalid input' })
     @ApiBody({ type: CreateUserDto })
     async create(@Body() createUserDto: CreateUserDto) {
-        const dateVal = new Date().getTime();
+        try {
+            this.logger.debug('Creating a new user');
+            const dateVal = new Date().getTime();
 
-        const user = new User();
-        user.username = createUserDto.username;
-        user.password = createUserDto.password;
-        user.role = createUserDto.role || UserRole.CUSTOMER;
-        user.createdAt = dateVal;
-        user.lastUpdatedAt = dateVal;
+            const user = new User();
+            user.username = createUserDto.username;
+            user.password = createUserDto.password;
+            user.role = createUserDto.role || UserRole.CUSTOMER;
+            user.createdAt = dateVal;
+            user.lastUpdatedAt = dateVal;
 
-        return this.usersService.create(user);
+            const newUser = await this.usersService.create(user);
+            this.logger.debug(`User created with ID: ${newUser.id}`);
+            return newUser;
+        } catch (error) {
+            this.logger.error('Error creating user', error);
+            throw new InternalServerErrorException('Error creating user');
+        }
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -53,7 +67,14 @@ export class UsersController {
     @ApiOperation({ summary: 'Get all users' })
     @ApiResponse({ status: 200, description: 'Users retrieved successfully', type: [User] })
     async findAll() {
-        return this.usersService.findAll();
+        try {
+            this.logger.debug('Fetching all users');
+            const users = await this.usersService.findAll();
+            return users;
+        } catch (error) {
+            this.logger.error('Error fetching users', error);
+            throw new InternalServerErrorException('Error fetching users');
+        }
     }
 
     @UseGuards(JwtAuthGuard)
@@ -61,8 +82,15 @@ export class UsersController {
     @ApiOperation({ summary: 'Get current user profile' })
     @ApiResponse({ status: 200, description: 'Profile retrieved successfully', type: User })
     async getProfile(@Request() req) {
-        const context: IRequestContext = req.context;
-        return this.usersService.findOne(context.userId);
+        try {
+            const context: IRequestContext = req.context;
+            this.logger.debug(`Fetching profile for user ID: ${context.userId}`);
+            const user = await this.usersService.findOne(context.userId);
+            return user;
+        } catch (error) {
+            this.logger.error('Error fetching profile', error);
+            throw new InternalServerErrorException('Error fetching profile');
+        }
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -73,7 +101,21 @@ export class UsersController {
     @ApiResponse({ status: 404, description: 'User not found' })
     @ApiParam({ name: 'id', description: 'User ID', type: Number })
     async findOne(@Param('id') id: number) {
-        return this.usersService.findOne(id);
+        try {
+            this.logger.debug(`Fetching user with ID: ${id}`);
+            const user = await this.usersService.findOne(id);
+            if (!user) {
+                this.logger.warn(`User with ID ${id} not found`);
+                throw new NotFoundException(`User with ID ${id} not found`);
+            }
+            return user;
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            this.logger.error(`Error fetching user with ID: ${id}`, error);
+            throw new InternalServerErrorException('Error fetching user');
+        }
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -89,11 +131,23 @@ export class UsersController {
         @Body() updateUserDto: Partial<User>,
         @Request() req,
     ) {
-        const userId = parseInt(id.toString(), 10);
-        if (req.user.userId !== userId && req.user.role !== UserRole.ADMIN) {
-            throw new UnauthorizedException();
+        try {
+            const userId = parseInt(id.toString(), 10);
+            this.logger.debug(`Updating user with ID: ${userId}`);
+            if (req.user.userId !== userId && req.user.role !== UserRole.ADMIN) {
+                this.logger.warn('Unauthorized attempt to update user');
+                throw new UnauthorizedException();
+            }
+            const result = await this.usersService.update(userId, updateUserDto);
+            this.logger.debug(`User with ID ${userId} updated`);
+            return result;
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            this.logger.error(`Error updating user with ID: ${id}`, error);
+            throw new InternalServerErrorException('Error updating user');
         }
-        return this.usersService.update(userId, updateUserDto);
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
@@ -104,6 +158,18 @@ export class UsersController {
     @ApiResponse({ status: 404, description: 'User not found' })
     @ApiParam({ name: 'id', description: 'User ID', type: Number })
     async remove(@Param('id') id: number) {
-        return this.usersService.remove(id);
+        try {
+            const userId = parseInt(id.toString(), 10);
+            this.logger.debug(`Deleting user with ID: ${userId}`);
+            await this.usersService.remove(userId);
+            this.logger.debug(`User with ID ${userId} deleted`);
+            return { message: 'User deleted successfully' };
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            this.logger.error(`Error deleting user with ID: ${id}`, error);
+            throw new InternalServerErrorException('Error deleting user');
+        }
     }
 }
